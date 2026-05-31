@@ -9,6 +9,7 @@ import Data.Aeson
 import Data.Text (Text)
 import GHC.Generics
 import Network.Wai.Handler.Warp (run)
+import Network.Wai.Middleware.Cors
 import Servant
 
 data LoginRequest = LoginRequest
@@ -59,8 +60,15 @@ pacientesHandler =
 api :: Proxy API
 api = Proxy
 
+corsPolicy :: CorsResourcePolicy
+corsPolicy =
+  simpleCorsResourcePolicy
+    { corsRequestHeaders = ["Content-Type", "Authorization"]
+    , corsMethods = ["GET", "POST", "OPTIONS"]
+    }
+
 app :: Application
-app = serve api server
+app = cors (const $ Just corsPolicy) $ serve api server
 
 main :: IO ()
 main = do
